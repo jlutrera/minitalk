@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_server.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jutrera- <jutrera-@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: jutrera- <jutrera-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/08 10:39:35 by ysoroko           #+#    #+#             */
-/*   Updated: 2023/01/06 12:34:14 by jutrera-         ###   ########.fr       */
+/*   Updated: 2023/01/14 15:29:55 by jutrera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,10 @@ static int	ft_receive_len(char **str, int signal)
 {
 	static int	len = 0;
 	static int	bit = 0;
-	const int	bits = __CHAR_BIT__ * sizeof(int);
 
 	if (signal == SIGUSR2)
 		len += ft_power(2, bit);
-	if (++bit == bits)
+	if (++bit == __CHAR_BIT__ * sizeof(int))
 	{
 		*str = ft_calloc(len + 1, sizeof(char));
 		if (!*str)
@@ -48,13 +47,12 @@ static int	ft_process(char **str, int c)
 	return (1);
 }
 
-static void	ft_receiving(int signal)
+static void	ft_receiving(int signal, siginfo_t *info, void *context)
 {
 	static int	c = 0;
 	static int	bit = 0;
 	static int	received = 0;
 	static char	*str = 0;
-	const int	bits = __CHAR_BIT__ * sizeof(char);
 
 	if (!received)
 		received = ft_receive_len(&str, signal);
@@ -62,7 +60,7 @@ static void	ft_receiving(int signal)
 	{
 		if (signal == SIGUSR2)
 			c += ft_power(2, bit);
-		if (++bit == bits)
+		if (++bit == __CHAR_BIT__ * sizeof(char))
 		{
 			received = ft_process(&str, c);
 			c = 0;
@@ -71,14 +69,27 @@ static void	ft_receiving(int signal)
 	}
 }
 
+void	init_sig(int sig, void (*handler)(int, siginfo_t *, void *))
+{
+	struct sigaction	susr;
+
+	susr.sa_sigaction = handler;
+	susr.sa_flags = SA_SIGINFO | SA_NODEFER;
+	sigemptyset(&susr.sa_mask);
+	if (sig == SIGUSR1)
+		sigaction(SIGUSR1, &susr, 0);
+	else if (sig == SIGUSR2)
+		sigaction(SIGUSR2, &susr, 0);
+}
+
 int	main(void)
 {
 	int	pid;
 
 	pid = getpid();
 	ft_printf("Server PID = %s%i%s\n", KYEL, pid, KNRM);
-	signal(SIGUSR1, ft_receiving);
-	signal(SIGUSR2, ft_receiving);
+	init_sig(SIGUSR1, &ft_receiving);
+	init_sig(SIGUSR2, &ft_receiving);
 	while (1)
 		sleep(1);
 }

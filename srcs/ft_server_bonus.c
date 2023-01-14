@@ -16,11 +16,10 @@ static int	ft_receive_len(char **str, int signal)
 {
 	static int	len = 0;
 	static int	bit = 0;
-	const int	bits = __CHAR_BIT__ * sizeof(int);
 
 	if (signal == SIGUSR2)
 		len += ft_power(2, bit);
-	if (++bit == bits)
+	if (++bit == __CHAR_BIT__ * sizeof(int))
 	{
 		*str = ft_calloc(len + 1, sizeof(char));
 		if (!*str)
@@ -84,7 +83,7 @@ void	init_sig(int sig, void (*handler)(int, siginfo_t *, void *))
 	struct sigaction	susr;
 
 	susr.sa_sigaction = handler;
-	susr.sa_flags = SA_SIGINFO | SA_RESTART | SA_NODEFER;
+	susr.sa_flags = SA_SIGINFO | SA_NODEFER;
 	sigemptyset(&susr.sa_mask);
 	if (sig == SIGUSR1)
 		sigaction(SIGUSR1, &susr, 0);

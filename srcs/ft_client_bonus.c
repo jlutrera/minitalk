@@ -15,10 +15,9 @@
 static void	ft_send_char(unsigned char c, int pid)
 {
 	int			i;
-	const int	bits = __CHAR_BIT__ * sizeof(char);
 
 	i = -1;
-	while (++i < bits)
+	while (++i < __CHAR_BIT__ * sizeof(char))
 	{
 		if (c & 0x01)
 			kill(pid, SIGUSR2);
@@ -32,10 +31,9 @@ static void	ft_send_char(unsigned char c, int pid)
 static void	ft_send_len(int len, int pid)
 {
 	int			i;
-	const int	bits = __CHAR_BIT__ * sizeof(int);
 
 	i = -1;
-	while (++i < bits)
+	while (++i <  __CHAR_BIT__ * sizeof(int))
 	{
 		if (len & 0x01)
 			kill(pid, SIGUSR2);
@@ -68,10 +66,8 @@ void	errors(int e)
 		ft_printf("Type: ./client [server PID] [string to send]\n");
 	else if (e == 2)
 		ft_printf("Bad PID number\n");
-	else if (e == 3)
-		ft_printf("Bad server PID\n");
 	else
-		ft_printf("Can't send to client\n");
+		ft_printf("Bad server PID\n");
 	exit (EXIT_FAILURE);
 }
 

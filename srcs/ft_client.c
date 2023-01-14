@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_client.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jutrera- <jutrera-@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: jutrera- <jutrera-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/08 11:33:40 by ysoroko           #+#    #+#             */
-/*   Updated: 2023/01/06 12:33:39 by jutrera-         ###   ########.fr       */
+/*   Updated: 2023/01/14 15:55:21 by jutrera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,9 @@
 static void	ft_send_char(unsigned char c, int pid)
 {
 	int			i;
-	const int	bits = __CHAR_BIT__ * sizeof(char);
 
 	i = -1;
-	while (++i < bits)
+	while (++i < __CHAR_BIT__ * sizeof(char))
 	{
 		if (c & 0x01)
 			kill(pid, SIGUSR2);
@@ -32,10 +31,9 @@ static void	ft_send_char(unsigned char c, int pid)
 static void	ft_send_len(int len, int pid)
 {
 	int			i;
-	const int	bits = __CHAR_BIT__ * sizeof(int);
 
 	i = -1;
-	while (++i < bits)
+	while (++i < __CHAR_BIT__ * sizeof(int))
 	{
 		if (len & 0x01)
 			kill(pid, SIGUSR2);
